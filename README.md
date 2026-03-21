@@ -13,3 +13,15 @@ Security and privacy are central to Spyk3 Bot’s design. The system employs sec
 Spyk3 Bot v10.0.0 also focuses on user experience, offering intuitive command structures and responsive interactions. Even complex operations are simplified into easy-to-use commands, making the tool accessible to both advanced cybersecurity professionals and intermediate users.
 
 In summary, Spyk3 Bot v10.0.0 is a versatile, multi-platform cybersecurity solution that transforms how users interact with security systems. By combining automation, modularity, and cross-platform accessibility, it delivers a modern approach to managing and executing cybersecurity operations efficiently and securely.
+
+
+# How to clone the repo
+```bash
+git clone https://github.com/Iankulani/spyk3-bot-v10.0.0.git
+cd spyk3-bot-v10.0.0
+```
+
+  # How to run
+  ```bash
+python spyk3-bot-v10.0.0.py
+```
