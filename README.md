@@ -17,11 +17,11 @@ In summary, Spyk3 Bot v10.0.0 is a versatile, multi-platform cybersecurity solut
 
 # How to clone the repo
 ```bash
-git clone https://github.com/Iankulani/spyk3-bot-v10.0.0.git
-cd spyk3-bot-v10.0.0
+git clone https://github.com/Iankulani/spyk3_bot.git
+cd spyk3_bot
 ```
 
   # How to run
   ```bash
-python spyk3-bot-v10.0.0.py
+python spyk3_bot.py
 ```
