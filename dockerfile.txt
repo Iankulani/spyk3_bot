@@ -1,0 +1,80 @@
+# Multi-stage build for SpyK3-Bot
+FROM python:3.11-slim as builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libffi-dev \
+    libssl-dev \
+    git \
+    wget \
+    curl \
+    nmap \
+    traceroute \
+    dnsutils \
+    iputils-ping \
+    net-tools \
+    nikto \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Final stage
+FROM python:3.11-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nmap \
+    traceroute \
+    dnsutils \
+    iputils-ping \
+    net-tools \
+    nikto \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -r spyk3 && useradd -r -g spyk3 spyk3
+
+# Set working directory
+WORKDIR /app
+
+# Copy installed packages from builder
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Copy application files
+COPY --chown=spyk3:spyk3 . .
+
+# Create required directories
+RUN mkdir -p .spyk3_bot/payloads .spyk3_bot/workspaces .spyk3_bot/scans \
+    .spyk3_bot/sessions .spyk3_bot/nikto_results .spyk3_bot/whatsapp_session \
+    .spyk3_bot/phishing_pages reports .spyk3_bot/traffic_logs \
+    .spyk3_bot/phishing_templates .spyk3_bot/phishing_logs \
+    .spyk3_bot/captured_credentials .spyk3_bot/ssh_keys \
+    .spyk3_bot/ssh_logs .spyk3_bot/time_history .spyk3_bot/wordlists \
+    temp && chown -R spyk3:spyk3 .spyk3_bot
+
+# Set permissions
+RUN chmod +x spyk3_bot.py
+
+# Switch to non-root user
+USER spyk3
+
+# Expose ports
+EXPOSE 8080 8081 8443
+
+# Volume for persistent data
+VOLUME ["/app/.spyk3_bot", "/app/reports"]
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import socket; socket.socket().connect(('localhost', 8080))" || exit 1
+
+# Entry point
+ENTRYPOINT ["python", "spyk3_bot.py"]
